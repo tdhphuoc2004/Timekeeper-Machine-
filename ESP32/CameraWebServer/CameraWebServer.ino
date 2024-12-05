@@ -1,6 +1,7 @@
 #include "esp_camera.h"
 #include <WiFi.h>
-
+#include <EEPROM.h> 
+#include <WebServer.h>
 //
 // WARNING!!! PSRAM IC required for UXGA resolution and high JPEG quality
 //            Ensure ESP32 Wrover Module or other board with PSRAM is selected
@@ -32,15 +33,110 @@
 //#define CAMERA_MODEL_DFRobot_FireBeetle2_ESP32S3 // Has PSRAM
 //#define CAMERA_MODEL_DFRobot_Romeo_ESP32S3 // Has PSRAM
 #include "camera_pins.h"
-
-// ===========================
-// Enter your WiFi credentials
-// ===========================
-const char *ssid = "CF CONG DONG";
-const char *password = "abcd1234";
-
 void startCameraServer();
 void setupLedFlash(int pin);
+// Create web server on port 80
+WebServer server(80);
+// HTML form for WiFi credentials
+const char* htmlForm = R"(
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi Configuration</title>
+</head>
+<body>
+    <h2>Enter WiFi Name and Password</h2>
+    <form action="/submit" method="POST">
+        <label for="wifi_name">WiFi Name:</label>
+        <input type="text" id="wifi_name" name="wifi_name" required><br><br>
+        
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        
+        <input type="submit" value="Connect">
+    </form>
+</body>
+</html>
+)";
+
+// Save WiFi credentials to EEPROM
+void saveWiFiCredentials(String ssid, String password) {
+  EEPROM.begin(512);
+  EEPROM.writeString(0, ssid);
+  EEPROM.writeString(100, password);
+  EEPROM.commit();
+  Serial.println("WiFi credentials saved to EEPROM.");
+}
+
+// Load WiFi credentials from EEPROM
+String loadWiFiSSID() {
+  EEPROM.begin(512);
+  String ssid = EEPROM.readString(0);
+  return ssid;
+}
+
+String loadWiFiPassword() {
+  EEPROM.begin(512);
+  String password = EEPROM.readString(100);
+  return password;
+}
+
+// Connect to WiFi with saved credentials
+void connectToWiFi(String ssid, String password) {
+  WiFi.begin(ssid.c_str(), password.c_str());
+  Serial.println("Connecting to WiFi...");
+  int attempts = 0;
+  
+  while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+    delay(500);
+    Serial.print(".");
+    attempts++;
+  }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("\nConnected to WiFi!");
+  } else {
+    Serial.println("\nFailed to connect to WiFi");
+  }
+}
+
+// Handle root request (serve HTML form)
+void handleRoot() {
+  server.send(200, "text/html", htmlForm);
+}
+
+// Handle form submission (save credentials and connect to WiFi)
+void handleFormSubmit() {
+  String wifiName = server.arg("wifi_name");
+  String wifiPassword = server.arg("password");
+
+  Serial.println("Received WiFi credentials:");
+  Serial.print("SSID: ");
+  Serial.println(wifiName);
+  Serial.print("Password: ");
+  Serial.println(wifiPassword);
+
+
+
+  // Try to connect to the WiFi network
+  connectToWiFi(wifiName, wifiPassword);
+
+  // Send response to user
+  if (WiFi.status() == WL_CONNECTED) {
+    server.send(200, "text/html", "<h2>Connected to WiFi! Please check the Serial Monitor for details.</h2>");
+    startCameraServer();  // Start the camera server once connected to WiFi
+    Serial.print("Camera Ready! Use 'http://");
+    Serial.print(WiFi.localIP());
+    Serial.println("' to connect");
+    // Save the WiFi credentials to EEPROM
+    saveWiFiCredentials(wifiName, wifiPassword);
+  } else 
+  {
+    server.send(200, "text/html", "<h2>Failed to connect. Try again.</h2>");
+  }
+}
 
 void setup() {
   Serial.begin(115200);
@@ -132,25 +228,69 @@ void setup() {
 #if defined(LED_GPIO_NUM)
   setupLedFlash(LED_GPIO_NUM);
 #endif
+ // Load stored WiFi credentials
+  String ssid = loadWiFiSSID();
+  String password = loadWiFiPassword();
 
-  WiFi.begin(ssid, password);
-  WiFi.setSleep(false);
+  // Check if stored WiFi credentials exist
+  if (ssid != "" && password != "") 
+  {
+    // If credentials are found, attempt to connect to WiFi
+    Serial.println("Found saved WiFi credentials, attempting to connect...");
 
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
+    bool connected = false;
+    int retryCount = 0;
+    int maxRetries = 5;  // Number of retry attempts
+
+    while (retryCount < maxRetries && !connected) {
+      connectToWiFi(ssid, password);  // Try to connect
+      if (WiFi.status() == WL_CONNECTED) {
+        connected = true;
+        startCameraServer();  // Start the camera server
+        Serial.print("Camera Ready! Use 'http://");
+        Serial.print(WiFi.localIP());
+        Serial.println("' to connect");
+      } else {
+        retryCount++;
+        Serial.print("Failed to connect, retrying... (");
+        Serial.print(retryCount);
+        Serial.print(" of ");
+        Serial.print(maxRetries);
+        Serial.println(")");
+        delay(5000);  // Wait before retrying (5 seconds)
+      }
+    }
+
+    if (!connected) 
+    {
+      // If connection fails after retries, notify the user
+      Serial.println("Unable to connect to WiFi after several attempts. Please check your network settings.");
+      Serial.println("Switching to Access Point mode...");
+      WiFi.softAP("ESP32-Access-Point", "123456789");
+      Serial.println("Access Point Started");
+      Serial.print("IP Address: ");
+      Serial.println(WiFi.softAPIP());  // Show AP IP address
+      server.on("/", HTTP_GET, handleRoot);  // Serve the WiFi configuration form
+      server.on("/submit", HTTP_POST, handleFormSubmit);  // Handle form submission
+      server.begin();  // Start the web server
+    }
+
   }
-  Serial.println("");
-  Serial.println("WiFi connected");
-
-  startCameraServer();
-
-  Serial.print("Camera Ready! Use 'http://");
-  Serial.print(WiFi.localIP());
-  Serial.println("' to connect");
+  else 
+  {
+    // If no credentials are found, start as Access Point and serve the form
+    Serial.println("No saved WiFi credentials found. Switching to Access Point mode...");
+    WiFi.softAP("ESP32-Access-Point", "123456789");
+    Serial.println("Access Point Started");
+    Serial.print("IP Address: ");
+    Serial.println(WiFi.softAPIP());  // Show AP IP address
+    server.on("/", HTTP_GET, handleRoot);  // Serve the WiFi configuration form
+    server.on("/submit", HTTP_POST, handleFormSubmit);  // Handle form submission
+    server.begin();  // Start the web server
+  }
 }
 
 void loop() {
-  // Do nothing. Everything is done in another task by the web server
   delay(10000);
+  server.handleClient();
 }
