@@ -1,17 +1,52 @@
 #include "esp_camera.h"
+#include <HTTPClient.h>
 #define CAMERA_MODEL_AI_THINKER 
 #include "camera_pins.h"
 #include "UtilsWifi.h"
 #include "ArduinoUtils.h"
-const int LED_PIN = 3; 
+#include <HardwareSerial.h>
+
+// Function to send debug messages to the HTTP server
+void sendDebugMessage(String message) {
+  HTTPClient http;
+
+  String serverURL = "http://10.1.1.249:5001/api/debug"; // Replace with your debug server URL
+
+  http.begin(serverURL);       // Initialize HTTP connection
+  http.addHeader("Content-Type", "application/json"); // Set content type to JSON
+
+  String jsonPayload = "{\"message\":\"" + message + "\"}"; // Create JSON payload
+  int httpResponseCode = http.POST(jsonPayload);           // Send POST request
+
+  if (httpResponseCode > 0) {
+    Serial.printf("HTTP POST successful, response code: %d\n", httpResponseCode);
+  } else {
+    Serial.printf("HTTP POST failed, error: %s\n", http.errorToString(httpResponseCode).c_str());
+  }
+
+  http.end(); // Close HTTP connection
+}
+
+// Function to receive messages from the server
+String receiveMessageFromServer(String serverURL) {
+  HTTPClient http;
+  String response = "";
+
+  // Initialize HTTP connection
+  http.begin(serverURL);
+  response = http.getString();
+  Serial.println("Server response: " + response);
+
+
+  http.end(); // Close HTTP connection
+  return response;
+}
+
 void setup() {
   Serial1.begin(9600);    // Communication with Arduino
   Serial.begin(115200);
   Serial.setDebugOutput(true);
   Serial.println();
-  pinMode(LED_PIN, OUTPUT);
-  Serial.println("ESP32 ready to communicate with Arduino.");
-  delay(1000); // Wait for Arduino to initialize
   camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
   config.ledc_timer = LEDC_TIMER_0;
@@ -99,27 +134,35 @@ void setup() {
 #endif
 //================================================= CODE HERE ========================================================
    initializeWiFi();
+  Serial.begin(115200);                // Debugging via USB
+  Serial1.begin(9600, SERIAL_8N1, 3, 1); // Serial1 for communication with Arduino
+  Serial.println("ESP32-CAM ready for bidirectional communication.");
+   //clearEEPROM(); 
 }
 
-void loop() {
-  delay(10000);
-  server.handleClient();
-      // Example usage
-    sendCommandToArduino("LED_ON");
-    String ack = waitForAcknowledgment();
-    if (ack == "OK") {
-        Serial.println("Arduino acknowledged the LED_ON command.");
-    } else {
-        Serial.println("No acknowledgment from Arduino.");
-    }
-    delay(5000);
+void loop() 
+{
+  handleServerRequests();
+  // // Send a message to Arduino every 2 seconds
+  // static unsigned long lastTime = 0;
+  // if (millis() - lastTime > 2000) {
+  //   lastTime = millis();
+  //   String messageToArduino = "Hello from ESP32-CAM!";
+  //   Serial1.println(messageToArduino); // Send message to Arduino
+  //   Serial.println("Sent to Arduino: " + messageToArduino); // Debug
+  //   sendDebugMessage("Sent to Arduino: " + messageToArduino);
+  // }
 
-    sendCommandToArduino("LED_OFF");
-    ack = waitForAcknowledgment();
-    if (ack == "OK") {
-        Serial.println("Arduino acknowledged the LED_OFF command.");
-    } else {
-        Serial.println("No acknowledgment from Arduino.");
-    }
-    delay(5000);
+  // // Check for messages from Arduino
+  // if (Serial1.available() > 0) {
+  //   String messageFromArduino = Serial1.readStringUntil('\n'); // Read message from Arduino
+  //   Serial.println("Received from Arduino: " + messageFromArduino); // Debug
+  //   sendDebugMessage("Sent to Arduino: " + messageFromArduino);
+  // }
+  
+  String serverURL = "http://10.1.1.249:5001/api/debug";
+  sendDebugMessage("dmmm"); 
+  String serverResponse = receiveMessageFromServer(serverURL);
+  Serial.println(serverResponse); 
+  delay(1000);  
 }

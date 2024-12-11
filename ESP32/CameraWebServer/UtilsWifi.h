@@ -1,16 +1,19 @@
-#include <WiFi.h>
-#include <EEPROM.h> 
-#include <WebServer.h>
-// Declare htmlForm and server as extern variables
-extern const char* htmlForm;
-extern WebServer server;
+#ifndef WIFI_UTILS_H
+#define WIFI_UTILS_H
+
+#include <Arduino.h>
+#include <vector>
+
+void saveWiFiCredentials(String ssid, String password);
+std::vector<std::pair<String, String>> loadWiFiCredentials();
+void connectToWiFi(String ssid, String password);
+bool connectToStoredWiFi();
+void handleRoot();
+void handleFormSubmit();
+void startAccessPoint();
+void initializeWiFi();
+void handleServerRequests();
 void startCameraServer();
 void setupLedFlash(int pin);
-void saveWiFiCredentials(String ssid, String password); 
-String loadWiFiSSID(); 
-String loadWiFiPassword(); 
-void connectToWiFi(String ssid, String password); 
-void handleFormSubmit(); 
-void handleRoot(); 
-void startAccessPoint(); 
-void initializeWiFi(); 
+void clearEEPROM(); 
+#endif // WIFI_UTILS_H
