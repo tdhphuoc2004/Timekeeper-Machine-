@@ -18,6 +18,6 @@ byte rowPins[numRows] = {12,11,4,9}; //Rows 0 to 3
 byte colPins[numCols]= {8,7,6,5}; //Columns 0 to 3
 
 Keypad myKeypad= Keypad(makeKeymap(keymap), rowPins, colPins, numRows, numCols);
-char getKey();
+String getKey();
 
 #endif // KEYPAD_UTILS_H
