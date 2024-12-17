@@ -1,5 +1,5 @@
 #include "KeyPad.h"
 
 String getKey() {
-    return myKeypad.getKey();
+    return <String>myKeypad.getKey();
 }
