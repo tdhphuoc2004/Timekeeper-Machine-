@@ -1,11 +1,12 @@
 #include "esp_camera.h"
+#include <WiFi.h>
 #include <HTTPClient.h>
 #define CAMERA_MODEL_AI_THINKER 
 #include "camera_pins.h"
 #include "UtilsWifi.h"
 #include "ArduinoUtils.h"
 #include <HardwareSerial.h>
-
+const char* serverUrl = "http://192.168.1.14:8080/upload";
 // Function to send debug messages to the HTTP server
 void sendDebugMessage(String message) {
   HTTPClient http;
@@ -43,7 +44,7 @@ String receiveMessageFromServer(String serverURL) {
 }
 
 void setup() {
-  Serial1.begin(9600);    // Communication with Arduino
+  // Serial1.begin(9600);    // Communication with Arduino
   Serial.begin(115200);
   Serial.setDebugOutput(true);
   Serial.println();
@@ -72,14 +73,14 @@ void setup() {
   //config.pixel_format = PIXFORMAT_RGB565; // for face detection/recognition
   config.grab_mode = CAMERA_GRAB_WHEN_EMPTY;
   config.fb_location = CAMERA_FB_IN_PSRAM;
-  config.jpeg_quality = 12;
+  config.jpeg_quality = 8;
   config.fb_count = 1;
 
   // if PSRAM IC present, init with UXGA resolution and higher JPEG quality
   //                      for larger pre-allocated frame buffer.
   if (config.pixel_format == PIXFORMAT_JPEG) {
     if (psramFound()) {
-      config.jpeg_quality = 10;
+      config.jpeg_quality = 8;
       config.fb_count = 2;
       config.grab_mode = CAMERA_GRAB_LATEST;
     } else {
@@ -89,7 +90,7 @@ void setup() {
     }
   } else {
     // Best option for face detection/recognition
-    config.frame_size = FRAMESIZE_240X240;
+    config.frame_size = FRAMESIZE_VGA;
 #if CONFIG_IDF_TARGET_ESP32S3
     config.fb_count = 2;
 #endif
@@ -116,7 +117,7 @@ void setup() {
   }
   // drop down frame size for higher initial frame rate
   if (config.pixel_format == PIXFORMAT_JPEG) {
-    s->set_framesize(s, FRAMESIZE_QVGA);
+    s->set_framesize(s, FRAMESIZE_HVGA);
   }
 
 #if defined(CAMERA_MODEL_M5STACK_WIDE) || defined(CAMERA_MODEL_M5STACK_ESP32CAM)
@@ -134,11 +135,46 @@ void setup() {
 #endif
 //================================================= CODE HERE ========================================================
    initializeWiFi();
-  Serial.begin(115200);                // Debugging via USB
-  Serial1.begin(9600, SERIAL_8N1, 3, 1); // Serial1 for communication with Arduino
+  // Serial.begin(115200);                // Debugging via USB
+  // Serial1.begin(9600, SERIAL_8N1, 3, 1); // Serial1 for communication with Arduino
   Serial.println("ESP32-CAM ready for bidirectional communication.");
    //clearEEPROM(); 
 }
+
+void sendImage() {
+  String boundary = "----ESP32Boundary";
+  String payload = "--" + boundary + "\r\n";
+  payload += "Content-Disposition: form-data; name=\"file\"; filename=\"image.jpg\"\r\n";
+  payload += "Content-Type: image/jpeg\r\n\r\n";
+
+  WiFiClient client;
+  HTTPClient http;
+
+  camera_fb_t *fb = esp_camera_fb_get();
+  if (!fb) {
+      Serial.println("Camera capture failed");
+      return;
+  }
+
+  // Create the HTTP payload
+  http.begin(client, serverUrl);
+  http.addHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
+
+  int httpResponseCode = http.POST(payload + String((char *)fb->buf, fb->len) + "\r\n--" + boundary + "--\r\n");
+
+  if (httpResponseCode > 0) {
+      Serial.printf("HTTP Response code: %d\n", httpResponseCode);
+      String response = http.getString();
+      Serial.println("Server response: " + response);
+      
+  } else {
+      Serial.printf("HTTP POST failed: %s\n", http.errorToString(httpResponseCode).c_str());
+  }
+
+  esp_camera_fb_return(fb);
+  http.end();
+}
+
 
 void loop() 
 {
@@ -160,9 +196,10 @@ void loop()
   //   sendDebugMessage("Sent to Arduino: " + messageFromArduino);
   // }
   
-  String serverURL = "http://10.1.1.249:5001/api/debug";
-  sendDebugMessage("dmmm"); 
-  String serverResponse = receiveMessageFromServer(serverURL);
-  Serial.println(serverResponse); 
-  delay(1000);  
+  // String serverURL = "http://10.1.1.249:5001/api/debug";
+  // sendDebugMessage("dmmm"); 
+  // String serverResponse = receiveMessageFromServer(serverURL);
+  // Serial.println(serverResponse); 
+  // sendImage();
+  delay(500);  
 }
