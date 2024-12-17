@@ -1,5 +1,5 @@
-#ifndef LCD_UTILS_H
-#define LCD_UTILS_H
+#ifndef KEYPAD_UTILS_H
+#define KEYPAD_UTILS_H
 
 #include <Arduino.h>
 #include <Keypad.h>
@@ -20,4 +20,4 @@ byte colPins[numCols]= {8,7,6,5}; //Columns 0 to 3
 Keypad myKeypad= Keypad(makeKeymap(keymap), rowPins, colPins, numRows, numCols);
 char getKey();
 
-#endif // LCD_UTILS_H
+#endif // KEYPAD_UTILS_H
