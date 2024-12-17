@@ -1,6 +1,6 @@
 #ifndef LCD_UTILS_H
 #define LCD_UTILS_H
-
+#include <LiquidCrystal_I2C.h>
 #include <Arduino.h>
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 // LCD pin definitions
