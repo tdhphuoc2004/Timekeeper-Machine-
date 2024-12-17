@@ -159,3 +159,37 @@ void initializeWiFi() {
 void handleServerRequests() {
     server.handleClient();
 }
+// Function to send debug messages to the HTTP server
+void sendDebugMessage(String message) {
+  HTTPClient http;
+
+  String serverURL = "http://10.1.1.25:5001/api/debug"; // Replace with your debug server URL
+
+  http.begin(serverURL);       // Initialize HTTP connection
+  http.addHeader("Content-Type", "application/json"); // Set content type to JSON
+
+  String jsonPayload = "{\"message\":\"" + message + "\"}"; // Create JSON payload
+  int httpResponseCode = http.POST(jsonPayload);           // Send POST request
+
+  if (httpResponseCode > 0) {
+    Serial.printf("HTTP POST successful, response code: %d\n", httpResponseCode);
+  } else {
+    Serial.printf("HTTP POST failed, error: %s\n", http.errorToString(httpResponseCode).c_str());
+  }
+
+  http.end(); // Close HTTP connection
+}
+
+// Function to receive messages from the server
+String receiveMessageFromServer(String serverURL) {
+  HTTPClient http;
+  String response = "";
+  // Initialize HTTP connection
+  http.begin(serverURL);
+  response = http.getString();
+  Serial.println("Server response: " + response);
+
+
+  http.end(); // Close HTTP connection
+  return response;
+}

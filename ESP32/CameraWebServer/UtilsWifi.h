@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <vector>
-
+#include <HTTPClient.h>
 void saveWiFiCredentials(String ssid, String password);
 std::vector<std::pair<String, String>> loadWiFiCredentials();
 void connectToWiFi(String ssid, String password);
@@ -16,4 +16,7 @@ void handleServerRequests();
 void startCameraServer();
 void setupLedFlash(int pin);
 void clearEEPROM(); 
+void sendDebugMessage(String message); 
+String receiveMessageFromServer(String serverURL); 
+
 #endif // WIFI_UTILS_H
