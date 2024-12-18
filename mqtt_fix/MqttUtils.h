@@ -2,6 +2,7 @@
 #define MQTT_UTILS_H
 #include <WiFi.h>
 #include <PubSubClient.h>
+#include <base64.h>
 
 const char* mqtt_server = "192.168.1.14"; // e.g., "192.168.1.10" or "broker.example.com"
 const int mqtt_port = 1883;
