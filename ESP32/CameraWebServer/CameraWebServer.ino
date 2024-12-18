@@ -4,6 +4,7 @@
 #include "camera_pins.h"
 #include "UtilsWifi.h"
 #include "ArduinoUtils.h"
+#include "MqttUtils.h"
 #include <HardwareSerial.h>
 HardwareSerial SerialPort(2); 
 
@@ -48,9 +49,9 @@ void sendImage()
 
 void setup() {
   // Serial1.begin(9600);    // Communication with Arduino
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.setDebugOutput(true);
-  SerialPort.begin(9600, SERIAL_8N1,  RXp2, TXp2); // Serial1 for communication with Arduino
+  SerialPort.begin(115200, SERIAL_8N1,  RXp2, TXp2); // Serial1 for communication with Arduino
   Serial.println("ESP32-CAM ready for bidirectional communication.");
 
   camera_config_t config;
@@ -147,18 +148,20 @@ void setup() {
 
 void loop() 
 {
-  handleServerRequests(); 
+  handleServerRequests();
+  mqtt_connect();
   if (SerialPort.available() > 0) 
   {  // If data is available from Arduino
     String messageFromArduino = "";
      char incomingChar = SerialPort.read();
       if (incomingChar != -1) 
       {
-        SerialPort.println(incomingChar);
-        sendDebugMessage(String(incomingChar)); 
+        messageFromArduino.concat(incomingChar);
+        messageFromArduino.concat(SerialPort.readStringUntil('#'));
+        SerialPort.println(messageFromArduino);
+        sendDebugMessage(String(messageFromArduino)); 
       }
-    sendDebugMessage("Nothing");
-  delay(100);  // Short delay for stabilit
   }
-  delay(1000); 
+  delay(100); 
+  
 }

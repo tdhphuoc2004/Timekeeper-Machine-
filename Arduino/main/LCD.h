@@ -1,12 +1,12 @@
-#ifndef LCD_UTILS_H
-#define LCD_UTILS_H
+#ifndef LCD_H
+#define LCD_H
 #include <LiquidCrystal_I2C.h>
 #include <Arduino.h>
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+const LiquidCrystal_I2C lcd(0x27, 16, 2);
 // LCD pin definitions
 void initializeLCD();
 void turnOnBacklight();
 void turnOffBacklight();
-void printToLCD(String message, int col, int row);
-
-#endif // LCD_UTILS_H
+void printToLCD(String message, int col=0, int row=0);
+void clearLCD();
+#endif // LCD_H

@@ -1,5 +1,4 @@
 #include "LCD.h"
-#include <LiquidCrystal_I2C.h>
 // Initialize LCD pins
 void initializeLCD() {
     lcd.init();
@@ -15,7 +14,10 @@ void turnOffBacklight() {
 }
 
 void printToLCD(String message, int col, int row) {
-    lcd.clear();
     lcd.setCursor(col, row);
     lcd.print(message);
+}
+
+void clearLCD() {
+  lcd.clear();
 }
