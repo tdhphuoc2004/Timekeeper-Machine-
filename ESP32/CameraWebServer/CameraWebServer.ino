@@ -1,22 +1,36 @@
+#pragma once
+#include "config.h"
 #include "esp_camera.h"
 #include <WiFi.h>
 #define CAMERA_MODEL_AI_THINKER 
 #include "camera_pins.h"
 #include "UtilsWifi.h"
 #include "ArduinoUtils.h"
-//#include "MqttUtils.h"
+#include "MqttUtils.h"
+#include "FaceUtils.h"
 #include <HardwareSerial.h>
 HardwareSerial SerialPort(2); 
 
-const char* serverUrl = "http://192.168.1.14:8080/upload";
+const char* faceServerUrl = "http://10.1.1.248:8080/recognize-face";
 #define RXp2 12
 #define TXp2 13
 
+const char* mqtt_server = "10.1.1.248"; // e.g., "192.168.1.10" or "broker.example.com"
+const int mqtt_port = 1883;
+const char* mqtt_user = "user";
+const char* mqtt_password = "123456";
 
+// MQTT Topics
+const char* faceTopic = "esp32cam/face"; // Topic to receive general messages
+const char* faceSuccessTopic = "esp32cam/face_result";
+WiFiClient espClient;
+PubSubClient mqttClient(espClient);
 
 void setup() {
   // Serial1.begin(9600);    // Communication with Arduino
    //Serial.begin(115200);
+  mqttClient.setServer(mqtt_server, mqtt_port);
+  mqttClient.setCallback(callback);
   Serial.begin(115200);
   Serial.setDebugOutput(true);
   SerialPort.begin(115200, SERIAL_8N1,  RXp2, TXp2); // Serial1 for communication with Arduino
@@ -117,19 +131,23 @@ void setup() {
 void loop() 
 {
   handleServerRequests();
-  //mqtt_connect();
-  if (SerialPort.available() > 0) 
-  {  // If data is available from Arduino
-    String messageFromArduino = "";
-     char incomingChar = SerialPort.read();
-      if (incomingChar != -1) 
-      {
-        messageFromArduino.concat(incomingChar);
-        messageFromArduino.concat(SerialPort.readStringUntil('#'));
-        SerialPort.println(messageFromArduino);
-        sendDebugMessage(String(messageFromArduino)); 
-      }
-  }
-  delay(100); 
+  // mqtt_connect();
+  // if(faceServerHandle()) {
+  //   Serial.println("Success");
+  // };
+  // if (SerialPort.available() > 0) 
+  // {  // If data is available from Arduino
+  //   String messageFromArduino = "";
+  //    char incomingChar = SerialPort.read();
+  //     if (incomingChar != -1) 
+  //     {
+  //       messageFromArduino.concat(incomingChar);
+  //       messageFromArduino.concat(SerialPort.readStringUntil('#'));
+  //       SerialPort.println(messageFromArduino);
+  //       sendDebugMessage(String(messageFromArduino));
+  //     }
+  // }
+
+  delay(5000); 
   
 }
