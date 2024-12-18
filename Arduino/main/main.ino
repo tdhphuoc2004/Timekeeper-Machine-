@@ -34,11 +34,11 @@ void loop() {
     if (key == '1') 
     {
       delay(100);
-      //initializeRFID(); 
-      //clearLCD();
-      //printToLCD("Option 1", 0, 0);
-      testRFID(); 
-     // deinitializeRFID(); 
+      clearLCD();
+      printToLCD("Option 1", 0, 0);
+      String res = RFIDtest('r', 1, ""); 
+      Serial.println(res); 
+  
     } else if (key == '2') {
       if(handleInputID()) {
         clearLCD();
