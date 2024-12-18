@@ -37,7 +37,9 @@ void loop() {
       clearLCD();
       printToLCD("Option 1", 0, 0);
       String res = RFIDtest('r', 1, ""); 
-      Serial.println(res); 
+      res += '#'; 
+      Serial.println(res);
+      sendToEsp32(res);  
   
     } else if (key == '2') {
       if(handleInputID()) {
