@@ -47,8 +47,8 @@ void mqtt_connect() {
     if (mqttClient.connect("ArduinoClient", mqtt_user, mqtt_password)) { // Use a unique client ID
       Serial.println("connected");
       // Subscribe to topics
-      mqttClient.subscribe(ledTopic);
-      mqttClient.subscribe(messageTopic);
+      // mqttClient.subscribe(ledTopic);
+      // mqttClient.subscribe(messageTopic);
     } else {
       Serial.print("failed, rc=");
       Serial.print(mqttClient.state());

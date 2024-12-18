@@ -1,8 +1,97 @@
 #include "RFIDUtils.h"
-
+#include "LCD.h" 
 // Create MFRC522 instance
 MFRC522 rfid(SS_PIN, RST_PIN);
 MFRC522::MIFARE_Key key;
+void testRFID() {
+    SPI.begin();            // Initialize SPI bus
+    rfid.PCD_Init();        // Initialize the RFID reader
+    Serial.println("RFID Reader Initialized. Place a card near the reader...");
+
+    // Initialize default key for authentication
+    for (byte i = 0; i < 6; i++) {
+        key.keyByte[i] = 0xFF;
+    }
+
+    // Wait for a card to be detected
+    if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial()) {
+        Serial.println("No card detected. Please place a card near the reader.");
+        return;
+    }
+
+    // Print card UID for debugging
+    Serial.print("Card UID: ");
+    for (byte i = 0; i < rfid.uid.size; i++) {
+        Serial.print(rfid.uid.uidByte[i], HEX);
+        Serial.print(" ");
+    }
+    Serial.println();
+
+    // Authenticate block 1
+    byte block = 1; // Example block for testing
+    if (rfid.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, block, &key, &(rfid.uid)) != MFRC522::STATUS_OK) {
+        Serial.println("Authentication failed for block 1!");
+        return;
+    }
+
+    Serial.println("Authentication successful for block 1!");
+
+    // Read block 1 to verify readability
+    byte buffer[18];
+    byte bufferSize = sizeof(buffer);
+    if (rfid.MIFARE_Read(block, buffer, &bufferSize) == MFRC522::STATUS_OK) {
+        Serial.print("Data in block 1: ");
+        for (byte i = 0; i < 16; i++) {
+            Serial.print(buffer[i], HEX);
+            Serial.print(" ");
+        }
+        Serial.println();
+    } else {
+        Serial.println("Failed to read block 1.");
+    }
+
+    // Write test data to block 1
+    byte testData[16] = { 'T', 'E', 'S', 'T', '_', 'D', 'A', 'T', 'A', '_', '1', '2', '3', '4', '\0', '\0' };
+    if (rfid.MIFARE_Write(block, testData, 16) == MFRC522::STATUS_OK) {
+        Serial.println("Test data written to block 1 successfully!");
+
+        // Read back the block to verify the write operation
+        if (rfid.MIFARE_Read(block, buffer, &bufferSize) == MFRC522::STATUS_OK) {
+            Serial.print("Data read back from block 1: ");
+            for (byte i = 0; i < 16; i++) {
+                Serial.print((char)buffer[i]); // Print as characters for readability
+            }
+            Serial.println();
+        } else {
+            Serial.println("Failed to read back block 1.");
+        }
+    } else {
+        Serial.println("Failed to write test data to block 1.");
+    }
+
+    // Delete data from block 1
+    byte emptyData[16] = { 0x00 }; // Empty data (all zeros)
+    if (rfid.MIFARE_Write(block, emptyData, 16) == MFRC522::STATUS_OK) {
+        Serial.println("Data in block 1 deleted successfully!");
+
+        // Verify deletion by reading back the block
+        if (rfid.MIFARE_Read(block, buffer, &bufferSize) == MFRC522::STATUS_OK) {
+            Serial.print("Data after deletion in block 1: ");
+            for (byte i = 0; i < 16; i++) {
+                Serial.print(buffer[i], HEX);
+                Serial.print(" ");
+            }
+            Serial.println();
+        } else {
+            Serial.println("Failed to read back block 1 after deletion.");
+        }
+    } else {
+        Serial.println("Failed to delete data in block 1.");
+    }
+
+    // Stop encryption on PCD
+    rfid.PCD_StopCrypto1();
+}
 
 // Initialize RFID reader
 void initializeRFID() {
@@ -14,6 +103,12 @@ void initializeRFID() {
     for (byte i = 0; i < 6; i++) {
         key.keyByte[i] = 0xFF;
     }
+}
+
+void deinitializeRFID() {
+    rfid.PCD_AntennaOff();  // Turn off the antenna
+    SPI.end();              // End SPI communication
+    Serial.println("RFID Reader Disabled.");
 }
 
 // Write a string to a specific block on the RFID card
