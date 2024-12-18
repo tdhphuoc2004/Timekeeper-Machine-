@@ -6,25 +6,28 @@
 #include "LCD.h"
 #include "Esp32.h"
 #include "Handle.h"
+#include "config.h"
 // #define NO_KEY '\0'  // Define NO_KEY as null character
-
+SoftwareSerial espSerial(2, 3); // RX = Pin 2, TX = Pin 3 for ESP32-CAM
 
 
 void setup() {
-  initializeEsp32();  // For debugging
+  Serial.begin(9600);
+  espSerial.begin(115200);  // For debugging
   initializeLCD();
 }
 
 void loop() {
   // handleInputID();
   char key = getKey();  // Use function call to get key
-  // if(key != NO_KEY) {
-  //   Serial.println(key);
-  //   clearLCD();
-  //   printToLCD(String(key), 0, 0);
-  // }
+  if(key != NO_KEY) {
+    Serial.println(key);
+    // clearLCD();
+    // printToLCD(String(key), 0, 0);
+  }
   // delay(100);
   if (key == '#') {
+     Serial.println("Welcome");
     clearLCD();
     printToLCD("Choose options:", 0, 0);
     do {
@@ -51,7 +54,11 @@ void loop() {
       }
     } else if (key == '3') {
       clearLCD();
+        Serial.println("gg");
       printToLCD("Option 3", 0, 0);
+      sendToEsp32("Face#"); 
+      Serial.print(receiveFromEsp32());  
+      
     } 
     
   }
