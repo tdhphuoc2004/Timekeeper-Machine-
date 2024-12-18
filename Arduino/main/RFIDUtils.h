@@ -17,4 +17,6 @@ void writeDataToCard(byte block, String data);
 String readDataFromCard(byte block);
 void deleteDataFromCard(byte block); 
 void printCardData();
+void deinitializeRFID(); 
+void testRFID(); 
 #endif

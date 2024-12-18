@@ -31,9 +31,14 @@ void loop() {
       key = getKey();
       delay(100);
     } while(key < '1' or key > '3');
-    if (key == '1') {
-      clearLCD();
-      printToLCD("Option 1", 0, 0);
+    if (key == '1') 
+    {
+      delay(100);
+      //initializeRFID(); 
+      //clearLCD();
+      //printToLCD("Option 1", 0, 0);
+      testRFID(); 
+     // deinitializeRFID(); 
     } else if (key == '2') {
       if(handleInputID()) {
         clearLCD();
@@ -49,4 +54,5 @@ void loop() {
     
   }
   delay(100);
+
 }

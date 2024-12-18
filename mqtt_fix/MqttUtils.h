@@ -11,7 +11,7 @@ const char* mqtt_password = "123456";
 // MQTT Topics
 const char* faceTopic = "arduino/face"; // Topic to receive general messages
 
-WiFiClient espClient;
+const WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 
 void faceServerHandle(String message);
