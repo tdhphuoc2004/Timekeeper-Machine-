@@ -77,7 +77,7 @@ void connectToWiFi(String ssid, String password) {
     Serial.println(ssid);
 
     int attempts = 0;
-    while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+    while (WiFi.status() != WL_CONNECTED && attempts < 5) {
         delay(500);
         Serial.print(".");
         attempts++;
@@ -163,7 +163,7 @@ void handleServerRequests() {
 void sendDebugMessage(String message) {
   HTTPClient http;
 
-  String serverURL = "http://10.1.1.70:5001/api/debug"; // Replace with your debug server URL
+  String serverURL = "http://192.168.1.14:5001/api/debug"; // Replace with your debug server URL
 
   http.begin(serverURL);       // Initialize HTTP connection
   http.addHeader("Content-Type", "application/json"); // Set content type to JSON

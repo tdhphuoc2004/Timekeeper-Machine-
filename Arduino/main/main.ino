@@ -15,6 +15,7 @@ void setup() {
   Serial.begin(9600);
   espSerial.begin(115200);  // For debugging
   initializeLCD();
+  espSerial.flush();
 }
 
 void loop() {
@@ -39,24 +40,24 @@ void loop() {
       delay(100);
       clearLCD();
       printToLCD("Option 1", 0, 0);
-      String res = RFIDtest('r', 1, ""); 
-      res += '#'; 
+      String res = RFIDtest('r', 1, "");
       Serial.println(res);
       sendToEsp32(res);  
   
     } else if (key == '2') {
       if(handleInputID()) {
         clearLCD();
-        printToLCD("OK", 0, 0);
+        printToLCD("Success", 0, 0);
       } else {
         clearLCD();
         printToLCD("Fail", 0, 0);
       }
     } else if (key == '3') {
       clearLCD();
-        Serial.println("gg");
+      Serial.println("gg");
       printToLCD("Option 3", 0, 0);
-      sendToEsp32("Face#"); 
+      sendToEsp32("Face");
+      delay(9000);
       Serial.print(receiveFromEsp32());  
       
     } 

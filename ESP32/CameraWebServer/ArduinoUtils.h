@@ -2,9 +2,10 @@
 #define ARDUINO_UTILS_H
 
 #include <Arduino.h> // Include the Arduino core library
-
+#include "config.h"
 // Function declarations
-String waitForAcknowledgment();
-void sendCommandToArduino(String command);
+void sendToArduino(String message);
+
+String receiveFromArduino();
 
 #endif

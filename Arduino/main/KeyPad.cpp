@@ -9,7 +9,7 @@ String getString(char end_char='#') {
   String str;
   while(key != end_char) {
     key = getKey();
-    if (key != NO_KEY) {
+    if (key != NO_KEY and key != end_char) {
       str.concat(key);
       clearLCD();
       printToLCD(str, 0, 0);

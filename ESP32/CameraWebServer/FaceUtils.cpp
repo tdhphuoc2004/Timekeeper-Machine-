@@ -28,14 +28,19 @@ bool faceServerHandle() {
         Serial.printf("HTTP Response code: %d\n", httpResponseCode);
         String response = http.getString();
         Serial.println("Server response: " + response);
-        if(strcmp(response.c_str(), "Success") == 0) face_success = true;
+        if(strcmp(response.c_str(), "Success") == 0) {
+          // sendToArduino(response);
+          face_success = true;
+          break;
+        }
     } else {
         Serial.printf("HTTP POST failed: %s\n", http.errorToString(httpResponseCode).c_str());
     }
 
     esp_camera_fb_return(fb);
     http.end();
-    if(millis() - startTime > 5000) break;
+    if(millis() - startTime > 8000) break;
+    delay(500);
   }
   return face_success;
 }

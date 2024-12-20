@@ -16,4 +16,5 @@ extern const char* faceSuccessTopic; // Topic to receive general messages
 extern WiFiClient espClient;
 extern PubSubClient mqttClient;
 
+extern HardwareSerial SerialPort;
 #endif

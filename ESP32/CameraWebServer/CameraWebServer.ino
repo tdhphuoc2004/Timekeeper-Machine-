@@ -11,11 +11,11 @@
 #include <HardwareSerial.h>
 HardwareSerial SerialPort(2); 
 
-const char* faceServerUrl = "http://10.1.1.248:8080/recognize-face";
-#define RXp2 12
-#define TXp2 13
+const char* faceServerUrl = "http://192.168.1.14:8080/recognize-face";
+#define RXp2 15
+#define TXp2 14
 
-const char* mqtt_server = "10.1.1.248"; // e.g., "192.168.1.10" or "broker.example.com"
+const char* mqtt_server = "192.168.1.14"; // e.g., "192.168.1.10" or "broker.example.com"
 const int mqtt_port = 1883;
 const char* mqtt_user = "user";
 const char* mqtt_password = "123456";
@@ -31,7 +31,7 @@ void setup() {
    //Serial.begin(115200);
   mqttClient.setServer(mqtt_server, mqtt_port);
   mqttClient.setCallback(callback);
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.setDebugOutput(true);
   SerialPort.begin(115200, SERIAL_8N1,  RXp2, TXp2); // Serial1 for communication with Arduino
   Serial.println("ESP32-CAM ready for bidirectional communication.");
@@ -127,7 +127,7 @@ void setup() {
 
    
 }
-
+int lastTime = millis();
 void loop() 
 {
   handleServerRequests();
@@ -137,17 +137,29 @@ void loop()
   // };
   // if (SerialPort.available() > 0) 
   // {  // If data is available from Arduino
-  //   String messageFromArduino = "";
-  //    char incomingChar = SerialPort.read();
-  //     if (incomingChar != -1) 
-  //     {
-  //       messageFromArduino.concat(incomingChar);
-  //       messageFromArduino.concat(SerialPort.readStringUntil('#'));
-  //       SerialPort.println(messageFromArduino);
-  //       sendDebugMessage(String(messageFromArduino));
-  //     }
-  // }
+    String messageFromArduino = "";
+     char incomingChar = SerialPort.read();
+      if (incomingChar != -1 and incomingChar != 255) 
+      {
+        messageFromArduino.concat(incomingChar);
+        messageFromArduino.concat(receiveFromArduino());
+        sendDebugMessage(String(messageFromArduino));
 
-  delay(5000); 
+        if(messageFromArduino == "Face") {
+          if(faceServerHandle()) {
+            sendToArduino("Success");
+          } else {
+            sendToArduino("Fail");
+          }
+        } else {
+          sendToArduino(messageFromArduino);
+        }
+
+      }
+      // sendDebugMessage("Nothing");
+
+  // }
+  // sendDebugMessage("Normal");
+  delay(100); 
   
 }
