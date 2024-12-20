@@ -42,6 +42,9 @@ void loop() {
       printToLCD("Option 1", 0, 0);
       String res = RFIDtest('r', 1, "");
       Serial.println(res);
+      setBuzzerState(BUZZER_OK); 
+      setBuzzerState(BUZZER_ERROR); 
+      setBuzzerState(BUZZER_ALERT); 
       sendToEsp32(res);  
   
     } else if (key == '2') {

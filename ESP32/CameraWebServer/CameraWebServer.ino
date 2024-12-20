@@ -9,7 +9,7 @@
 #include "MqttUtils.h"
 #include "FaceUtils.h"
 #include <HardwareSerial.h>
-HardwareSerial SerialPort(2); 
+//HardwareSerial SerialPort(2); 
 
 const char* faceServerUrl = "http://192.168.1.14:8080/recognize-face";
 #define RXp2 15
@@ -27,13 +27,13 @@ WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 
 void setup() {
-  // Serial1.begin(9600);    // Communication with Arduino
-   //Serial.begin(115200);
+  //Serial1.begin(9600);    // Communication with Arduino
+  Serial.begin(115200);
   mqttClient.setServer(mqtt_server, mqtt_port);
   mqttClient.setCallback(callback);
-  Serial.begin(9600);
+//  Serial.begin(9600);
   Serial.setDebugOutput(true);
-  SerialPort.begin(115200, SERIAL_8N1,  RXp2, TXp2); // Serial1 for communication with Arduino
+  //SerialPort.begin(115200, SERIAL_8N1,  RXp2, TXp2); // Serial1 for communication with Arduino
   Serial.println("ESP32-CAM ready for bidirectional communication.");
 
   camera_config_t config;
@@ -138,7 +138,7 @@ void loop()
   // if (SerialPort.available() > 0) 
   // {  // If data is available from Arduino
     String messageFromArduino = "";
-     char incomingChar = SerialPort.read();
+     char incomingChar = Serial.read();
       if (incomingChar != -1 and incomingChar != 255) 
       {
         messageFromArduino.concat(incomingChar);

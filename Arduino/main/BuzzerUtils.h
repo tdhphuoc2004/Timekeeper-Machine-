@@ -4,13 +4,14 @@
 #include <Arduino.h>
 
 // Buzzer pin definition
-#define BUZZER_PIN 5
+#define BUZZER_PIN A3
 
 // Buzzer states
 enum BuzzerState {
     BUZZER_OFF,
     BUZZER_OK,
-    BUZZER_ERROR
+    BUZZER_ERROR,
+    BUZZER_ALERT
 };
 
 // Function prototypes

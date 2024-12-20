@@ -7,6 +7,7 @@ void initializeBuzzer() {
 }
 
 // Set the buzzer state
+// Function to set the buzzer state
 void setBuzzerState(BuzzerState state) {
     switch (state) {
         case BUZZER_OFF:
@@ -23,6 +24,14 @@ void setBuzzerState(BuzzerState state) {
             for (int i = 0; i < 3; i++) { // Play 3 short error beeps
                 tone(BUZZER_PIN, 500, 200); // Play a tone (500 Hz for 200 ms)
                 delay(300);                 // Wait between beeps
+            }
+            noTone(BUZZER_PIN); // Stop the buzzer
+            break;
+
+        case BUZZER_ALERT:
+            for (int i = 0; i < 20; i++) { // Play 5 fast alert beeps
+                tone(BUZZER_PIN, 1500, 100); // Play a tone (1.5 kHz for 100 ms)
+                delay(150);                  // Short delay between beeps
             }
             noTone(BUZZER_PIN); // Stop the buzzer
             break;
