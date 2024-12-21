@@ -17,6 +17,7 @@ void startCameraServer();
 void setupLedFlash(int pin);
 void clearEEPROM(); 
 void sendDebugMessage(String message); 
+String checkIn(String id);
 String receiveMessageFromServer(String serverURL); 
 
 #endif // WIFI_UTILS_H

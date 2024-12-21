@@ -77,7 +77,7 @@ void connectToWiFi(String ssid, String password) {
     Serial.println(ssid);
 
     int attempts = 0;
-    while (WiFi.status() != WL_CONNECTED && attempts < 10) {
+    while (WiFi.status() != WL_CONNECTED && attempts < 20) {
         delay(500);
         Serial.print(".");
         attempts++;
@@ -147,11 +147,11 @@ void startAccessPoint() {
 
 void initializeWiFi() {
     if (connectToStoredWiFi()) {
-        Serial.print("Connected to WiFi! Use 'http://");
-        Serial.print(WiFi.localIP());
-        Serial.println("' to access.");
+        // Serial.print("Connected to WiFi! Use 'http://");
+        // Serial.print(WiFi.localIP());
+        // Serial.println("' to access.");
     } else {
-        Serial.println("Failed to connect to all stored WiFi networks.");
+        // Serial.println("Failed to connect to all stored WiFi networks.");
         startAccessPoint(); // Switch to AP mode
     }
 }
@@ -163,7 +163,7 @@ void handleServerRequests() {
 void sendDebugMessage(String message) {
   HTTPClient http;
 
-  String serverURL = "http://192.168.1.14:5001/api/debug"; // Replace with your debug server URL
+  String serverURL = "http://10.1.1.25:5001/api/debug"; // Replace with your debug server URL
 
   http.begin(serverURL);       // Initialize HTTP connection
   http.addHeader("Content-Type", "application/json"); // Set content type to JSON
@@ -171,13 +171,35 @@ void sendDebugMessage(String message) {
   String jsonPayload = "{\"message\":\"" + message + "\"}"; // Create JSON payload
   int httpResponseCode = http.POST(jsonPayload);           // Send POST request
 
-  if (httpResponseCode > 0) {
-    Serial.printf("HTTP POST successful, response code: %d\n", httpResponseCode);
-  } else {
-    Serial.printf("HTTP POST failed, error: %s\n", http.errorToString(httpResponseCode).c_str());
-  }
-
+  // if (httpResponseCode > 0) {
+  //   Serial.printf("HTTP POST successful, response code: %d\n", httpResponseCode);
+  // } else {
+  //   Serial.printf("HTTP POST failed, error: %s\n", http.errorToString(httpResponseCode).c_str());
+  // }
+    // Serial.flush();
   http.end(); // Close HTTP connection
+}
+
+String checkIn(String id) {
+  HTTPClient http;
+
+  String serverURL = "http://10.1.1.25:5001/api/checkin/employee/"+id; // Replace with your debug server URL
+
+  http.begin(serverURL);       // Initialize HTTP connection
+  http.addHeader("Content-Type", "application/json"); // Set content type to JSON
+
+  // String jsonPayload = "{\"message\":\"" + message + "\"}"; // Create JSON payload
+  int httpResponseCode = http.POST("{}");        // Send POST request
+  Serial.flush();
+  http.end();
+  if (httpResponseCode == 404) {
+    return "NF";
+  } else if (httpResponseCode == 200) {
+    return "OK";
+  } else {
+    return "Err";
+  }
+   // Close HTTP connection
 }
 
 // Function to receive messages from the server

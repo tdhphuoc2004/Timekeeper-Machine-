@@ -7,6 +7,6 @@
 #include "esp_camera.h"
 #include "ArduinoUtils.h"
 
-bool faceServerHandle();
+String faceServerHandle();
 
 #endif // FACE_UTILS_H

@@ -11,11 +11,11 @@
 #include <HardwareSerial.h>
 HardwareSerial SerialPort(2); 
 
-const char* faceServerUrl = "http://192.168.1.14:8080/recognize-face";
-#define RXp2 16
-#define TXp2 13
+const char* faceServerUrl = "http://10.1.1.44:8080/recognize-face";
+#define RXp2 15
+#define TXp2 14
 
-const char* mqtt_server = "192.168.1.14"; // e.g., "192.168.1.10" or "broker.example.com"
+const char* mqtt_server = "10.1.1.44"; // e.g., "192.168.1.10" or "broker.example.com"
 const int mqtt_port = 1883;
 const char* mqtt_user = "user";
 const char* mqtt_password = "123456";
@@ -28,13 +28,13 @@ PubSubClient mqttClient(espClient);
 
 void setup() {
   //Serial1.begin(9600);    // Communication with Arduino
-  Serial.begin(115200);
+  // Serial.begin(115200);
   mqttClient.setServer(mqtt_server, mqtt_port);
   mqttClient.setCallback(callback);
-//  Serial.begin(9600);
+ Serial.begin(115200);
   Serial.setDebugOutput(true);
-  SerialPort.begin(115200, SERIAL_8N1,  RXp2, TXp2); // Serial1 for communication with Arduino
-  Serial.println("ESP32-CAM ready for bidirectional communication.");
+  // SerialPort.begin(115200, SERIAL_8N1,  RXp2, TXp2); // Serial1 for communication with Arduino
+  // Serial.println("ESP32-CAM ready for bidirectional communication.");
 
   camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
@@ -122,10 +122,12 @@ void setup() {
   setupLedFlash(LED_GPIO_NUM);
 #endif
 //================================================= CODE HERE ========================================================
- // clearEEPROM(); 
+//  clearEEPROM(); 
   initializeWiFi();
-
-   
+  
+  //  Serial.flush();
+  Serial.end();
+  Serial.begin(115200);
 }
 int lastTime = millis();
 void loop() 
@@ -137,25 +139,30 @@ void loop()
   // };
   // if (SerialPort.available() > 0) 
   // {  // If data is available from Arduino
-    String messageFromArduino = "";
-     char incomingChar = Serial.read();
-      if (incomingChar != -1 and incomingChar != 255) 
-      {
-        messageFromArduino.concat(incomingChar);
-        messageFromArduino.concat(receiveFromArduino());
-        sendDebugMessage(String(messageFromArduino));
+  // String result = checkIn("22127000");
+  // Serial.println(result);
+  // faceServerHandle();
+    char incomingChar = Serial.read();
+    if (incomingChar == '@') 
+    {
+      // messageFromArduino.concat(incomingChar);
+      String messageFromArduino = receiveFromArduino();
 
-        if(messageFromArduino == "Face") {
-          if(faceServerHandle()) {
-            sendToArduino("Success");
-          } else {
-            sendToArduino("Fail");
-          }
+      if(messageFromArduino == "Face") {
+        String id = faceServerHandle();
+        if (id != "NF" and id != "CAM") {
+          String response = checkIn(id);
+          sendToArduino(response);
         } else {
-          sendToArduino(messageFromArduino);
+          sendToArduino(id);
         }
-
+        
+      } else {
+        String response = checkIn(messageFromArduino);
+        sendToArduino(response);
       }
+
+    }
       // sendDebugMessage("Nothing");
 
   // }

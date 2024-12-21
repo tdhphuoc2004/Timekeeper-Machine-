@@ -1,8 +1,9 @@
 #include "FaceUtils.h"
 
-bool faceServerHandle() {
+String faceServerHandle() {
   bool face_success = false;
   int startTime = millis();
+  String id = "";
   while(!face_success) {
     String boundary = "----ESP32Boundary";
     String payload = "--" + boundary + "\r\n";
@@ -15,7 +16,7 @@ bool faceServerHandle() {
     camera_fb_t *fb = esp_camera_fb_get();
     if (!fb) {
         Serial.println("Camera capture failed");
-        return false;
+        return "CAM";
     }
 
     // Create the HTTP payload
@@ -24,23 +25,26 @@ bool faceServerHandle() {
 
     int httpResponseCode = http.POST(payload + String((char *)fb->buf, fb->len) + "\r\n--" + boundary + "--\r\n");
 
-    if (httpResponseCode > 0) {
-        Serial.printf("HTTP Response code: %d\n", httpResponseCode);
+    if (httpResponseCode == 200) {
+        // Serial.printf("HTTP Response code: %d\n", httpResponseCode);
         String response = http.getString();
-        Serial.println("Server response: " + response);
-        if(strcmp(response.c_str(), "Success") == 0) {
+        response.replace("\"", "");
+        // Serial.println("Server response: " + response);
+        sendDebugMessage(response);
+        if(response != "Unknown") {
           // sendToArduino(response);
           face_success = true;
+          id = response;
+          esp_camera_fb_return(fb);
+          http.end();
           break;
         }
-    } else {
-        Serial.printf("HTTP POST failed: %s\n", http.errorToString(httpResponseCode).c_str());
     }
 
-    esp_camera_fb_return(fb);
-    http.end();
+    
     if(millis() - startTime > 8000) break;
-    delay(500);
+    delay(800);
   }
-  return face_success;
+  if(face_success) return id;
+  else return "NF";
 }
