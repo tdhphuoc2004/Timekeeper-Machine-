@@ -1,27 +1,22 @@
 #include "LedUtils.h"
 
-// Initialize LED pins
-void initializeLEDs() {
-    pinMode(RED_LED_PIN, OUTPUT);
-    pinMode(GREEN_LED_PIN, OUTPUT);
-    turnOffLEDs(); // Ensure LEDs are off at initialization
-    turnOnRedLED(); // Default to red LED on
+void initLEDs() {
+  pinMode(GREEN_LED_PIN, OUTPUT);
+  digitalWrite(GREEN_LED_PIN, LOW);
 }
 
-// Turn on the red LED and turn off the green LED
-void turnOnRedLED() {
-    digitalWrite(RED_LED_PIN, HIGH);
-    digitalWrite(GREEN_LED_PIN, LOW);
+void signalOK() {
+  digitalWrite(GREEN_LED_PIN, HIGH);
+  delay(5000); 
+  digitalWrite(GREEN_LED_PIN, LOW);
 }
 
-// Turn on the green LED and turn off the red LED
-void turnOnGreenLED() {
-    digitalWrite(RED_LED_PIN, LOW);
+void signalFalse() {
+  unsigned long start = millis();
+  while (millis() - start < 5000) {
     digitalWrite(GREEN_LED_PIN, HIGH);
-}
-
-// Turn off both LEDs
-void turnOffLEDs() {
-    digitalWrite(RED_LED_PIN, LOW);
+    delay(250);
     digitalWrite(GREEN_LED_PIN, LOW);
+    delay(250);
+  }
 }

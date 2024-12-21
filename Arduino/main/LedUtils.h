@@ -4,13 +4,11 @@
 #include <Arduino.h>
 
 // LED pin definitions
-#define RED_LED_PIN 7
-#define GREEN_LED_PIN 6
+#define GREEN_LED_PIN A0
 
 // Functions to control the LEDs
-void initializeLEDs();
-void turnOnRedLED();
-void turnOnGreenLED();
-void turnOffLEDs();
+void initLEDs();
+void signalOK(); 
+void signalFalse(); 
 
 #endif // LED_UTILS_H
