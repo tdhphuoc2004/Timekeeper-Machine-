@@ -7,9 +7,7 @@ bool handleInputID() {
   sendToEsp32(id);
   delay(100);
   String messageFromESP32 = receiveFromEsp32();
-  Serial.println(messageFromESP32);
-  Serial.println(id);
-  if (messageFromESP32 == id) return true;
+  if (messageFromESP32 == "OK") return true;
   else {
     return false;
   }

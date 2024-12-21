@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 // Buzzer pin definition
-#define BUZZER_PIN A3
+#define BUZZER_PIN A2
 
 // Buzzer states
 enum BuzzerState {

@@ -5,12 +5,18 @@ void initializeEsp32() {
   espSerial.begin(115200);
 }
 void sendToEsp32(String message) {
-  message += "#";
-  espSerial.println(message);
+  String modifiedMessage = "@" + message + "#"; 
+  Serial.println(modifiedMessage);
+  espSerial.flush();
+  espSerial.println(modifiedMessage);
 }
 
 String receiveFromEsp32() {
-  delay(100);
-  
+  char receive = '#'; 
+  while (receive != '@')
+  {
+    receive = espSerial.read();
+  }
+
   return espSerial.readStringUntil('#');
 }
