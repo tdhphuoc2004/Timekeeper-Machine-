@@ -17,8 +17,8 @@ const char* htmlForm = R"(
         <label for="wifi_name">WiFi Name:</label>
         <input type="text" id="wifi_name" name="wifi_name" required><br><br>
         
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br><br>
+        <label for="password">Password (optional):</label>
+        <input type="password" id="password" name="password"><br><br>
         
         <input type="submit" value="Connect">
     </form>
@@ -77,7 +77,7 @@ void connectToWiFi(String ssid, String password) {
     Serial.println(ssid);
 
     int attempts = 0;
-    while (WiFi.status() != WL_CONNECTED && attempts < 5) {
+    while (WiFi.status() != WL_CONNECTED && attempts < 10) {
         delay(500);
         Serial.print(".");
         attempts++;

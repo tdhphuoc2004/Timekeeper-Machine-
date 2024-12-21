@@ -9,11 +9,11 @@
 #include "MqttUtils.h"
 #include "FaceUtils.h"
 #include <HardwareSerial.h>
-//HardwareSerial SerialPort(2); 
+HardwareSerial SerialPort(2); 
 
 const char* faceServerUrl = "http://192.168.1.14:8080/recognize-face";
-#define RXp2 15
-#define TXp2 14
+#define RXp2 16
+#define TXp2 13
 
 const char* mqtt_server = "192.168.1.14"; // e.g., "192.168.1.10" or "broker.example.com"
 const int mqtt_port = 1883;
@@ -33,7 +33,7 @@ void setup() {
   mqttClient.setCallback(callback);
 //  Serial.begin(9600);
   Serial.setDebugOutput(true);
-  //SerialPort.begin(115200, SERIAL_8N1,  RXp2, TXp2); // Serial1 for communication with Arduino
+  SerialPort.begin(115200, SERIAL_8N1,  RXp2, TXp2); // Serial1 for communication with Arduino
   Serial.println("ESP32-CAM ready for bidirectional communication.");
 
   camera_config_t config;
