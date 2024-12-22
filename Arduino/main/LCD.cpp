@@ -3,6 +3,7 @@
 void initializeLCD() {
     lcd.init();
     lcd.noBacklight();
+    lcd.clear();
 }
 
 void turnOnBacklight() {

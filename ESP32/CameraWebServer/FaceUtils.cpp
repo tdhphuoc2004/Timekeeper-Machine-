@@ -30,7 +30,8 @@ String faceServerHandle() {
         String response = http.getString();
         response.replace("\"", "");
         // Serial.println("Server response: " + response);
-        // sendDebugMessage(response);
+        sendDebugMessage(response);
+
         if(response != "Unknown") {
           
           face_success = true;

@@ -138,7 +138,7 @@ void startAccessPoint() {
     WiFi.softAP("ESP32-Access-Point", "123456789");
     Serial.println("Access Point started.");
     Serial.print("AP IP Address: ");
-    Serial.println(WiFi.softAPIP());
+    Serial.print("$"+String(WiFi.softAPIP())+"#");
 
     server.on("/", HTTP_GET, handleRoot);
     server.on("/submit", HTTP_POST, handleFormSubmit);
@@ -204,7 +204,7 @@ String checkIn(String id) {
 
 bool checkPhoto(String photo) {
   HTTPClient http;
-
+  
   String serverURL = "http://10.1.1.44:8080/check-photo"; // Replace with your debug server URL
 
   http.begin(serverURL);       // Initialize HTTP connection

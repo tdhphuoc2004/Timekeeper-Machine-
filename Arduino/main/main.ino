@@ -109,12 +109,17 @@ void loop() {
       }
      
       Serial.println("Response:");
-      Serial.println(response); 
+      Serial.println(response);
       if (response == "OK")
       {
          printToLCD("Successful", 0, 1); 
          setBuzzerState(BUZZER_OK); 
           signalOK(); 
+      } else if (response == "Dark")
+      {
+         printToLCD("Too dark", 0, 1); 
+         setBuzzerState(BUZZER_ERROR); 
+          signalFalse(); 
       }
       else
       {

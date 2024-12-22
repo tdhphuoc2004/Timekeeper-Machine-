@@ -124,8 +124,8 @@ void setup() {
 //================================================= CODE HERE ========================================================
 //  clearEEPROM(); 
   initializeWiFi();
-  
-  //  Serial.flush();
+  Serial.print("&");
+   Serial.flush();
   // Serial.end();
   // Serial.begin(115200);
 }
@@ -156,19 +156,26 @@ void loop()
       String messageFromArduino = receiveFromArduino();
       sendDebugMessage(messageFromArduino);
       if(messageFromArduino == "Face") {
+        incomingChar = Serial.read();
+        while (incomingChar != '@') {
+          incomingChar = Serial.read();
+        }
         String photo = receiveFromArduino();
-        String id = faceServerHandle(photo);
+        String id = faceServerHandle();
         if (id != "NF" and id != "CAM") {
           String response = checkIn(id);
           sendToArduino(id);
           sendToArduino(response);
         } else if(id == "NF") {
+          sendDebugMessage(photo);
           if(checkPhoto(photo)) {
             sendToArduino(id);
           } else {
             sendToArduino("Dark");
           }
           
+        } else {
+          sendToArduino(id);
         }
         
       } else {
