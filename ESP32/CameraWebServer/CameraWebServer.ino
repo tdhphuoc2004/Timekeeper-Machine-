@@ -122,10 +122,12 @@ void setup() {
   setupLedFlash(LED_GPIO_NUM);
 #endif
 //================================================= CODE HERE ========================================================
-//  clearEEPROM(); 
+  // clearEEPROM(); 
+
   initializeWiFi();
-  Serial.print("&");
    Serial.flush();
+
+  // Serial.print("@");
   // Serial.end();
   // Serial.begin(115200);
 }

@@ -138,7 +138,9 @@ void startAccessPoint() {
     WiFi.softAP("ESP32-Access-Point", "123456789");
     Serial.println("Access Point started.");
     Serial.print("AP IP Address: ");
-    Serial.print("$"+String(WiFi.softAPIP())+"#");
+    // Serial.print("$");
+    Serial.print(WiFi.softAPIP());
+    // Serial.print("#");
 
     server.on("/", HTTP_GET, handleRoot);
     server.on("/submit", HTTP_POST, handleFormSubmit);
