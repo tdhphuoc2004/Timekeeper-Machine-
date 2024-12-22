@@ -126,8 +126,8 @@ void setup() {
   initializeWiFi();
   
   //  Serial.flush();
-  Serial.end();
-  Serial.begin(115200);
+  // Serial.end();
+  // Serial.begin(115200);
 }
 int lastTime = millis();
 void loop() 

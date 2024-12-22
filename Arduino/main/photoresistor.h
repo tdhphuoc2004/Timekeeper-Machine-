@@ -4,5 +4,6 @@
 #include <Arduino.h>
 
 bool isLightAboveThreshold(int sensorPin, int threshold);
+int getPhotoValue(int sensorPin);
 
 #endif

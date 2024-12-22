@@ -11,8 +11,9 @@
 // #define NO_KEY '\0'  // Define NO_KEY as null character
 SoftwareSerial espSerial(2, 3); // RX = Pin 2, TX = Pin 3 for ESP32-CAM
 #define PHOTO_PIN       A1
-#define LIGHT_THRESHOLD 500 
-
+#define LIGHT_THRESHOLD 500
+#define BUTTON 13
+bool start = false;
 void setup() {
   Serial.begin(9600);
   espSerial.begin(115200);  // For debugging
@@ -21,17 +22,23 @@ void setup() {
   initializeBuzzer(); 
   espSerial.flush();
   Serial.println("Arduino ready for communication.");  
+  
+}
+  
+void loop() {
+  // // handleInputID();
   if(isLightAboveThreshold(PHOTO_PIN, LIGHT_THRESHOLD))
   {
       lcd.backlight();
   }
   else lcd.noBacklight();
- 
-}
-
-void loop() {
-  // // handleInputID();
-  char key = getKey();  // Use function call to get key
+  int readButton = digitalRead(BUTTON);
+  if(readButton == HIGH) {
+    start = !start;
+    delay(100);
+  }
+  if(start) {
+    char key = getKey();  // Use function call to get key
   if(key != NO_KEY) {
     Serial.println(key);
   }
@@ -46,6 +53,7 @@ void loop() {
     } while(key < '1' or key > '3');
     if (key == '1') 
     {
+
       delay(100);
       clearLCD();
       printToLCD("Option 1", 0, 0);
@@ -90,10 +98,18 @@ void loop() {
       Serial.println("gg");
       printToLCD("Option 3", 0, 0);
       sendToEsp32("Face");
-      String response = receiveFromEsp32(); 
+      sendToEsp32(String(getPhotoValue(PHOTO_PIN)));
+      String id = receiveFromEsp32();
+      String response = ""; 
+      if (id[0] == '2') {
+        printToLCD(id, 0, 0);
+        response = receiveFromEsp32(); 
+      } else {
+        response = id;
+      }
+     
       Serial.println("Response:");
       Serial.println(response); 
-      printToLCD(res, 0, 0); 
       if (response == "OK")
       {
          printToLCD("Successful", 0, 1); 
@@ -110,6 +126,8 @@ void loop() {
     } 
     
   }
+  }
+  
   delay(100);
   //  turnOnRedLED(); 
   //   delay(2000);
