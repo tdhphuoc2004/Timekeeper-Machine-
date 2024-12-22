@@ -6,6 +6,7 @@
 #include "UtilsWifi.h"
 #include "esp_camera.h"
 #include "ArduinoUtils.h"
+#include <ArduinoJson.h>
 
 String faceServerHandle();
 

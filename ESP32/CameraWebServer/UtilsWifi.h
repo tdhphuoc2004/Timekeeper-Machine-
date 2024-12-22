@@ -17,6 +17,7 @@ void startCameraServer();
 void setupLedFlash(int pin);
 void clearEEPROM(); 
 void sendDebugMessage(String message); 
+bool checkPhoto(String photo);
 String checkIn(String id);
 String receiveMessageFromServer(String serverURL); 
 

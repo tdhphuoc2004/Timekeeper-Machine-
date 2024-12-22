@@ -29,16 +29,26 @@ String faceServerHandle() {
         // Serial.printf("HTTP Response code: %d\n", httpResponseCode);
         String response = http.getString();
         response.replace("\"", "");
-        Serial.println("Server response: " + response);
-        sendDebugMessage(response);
+        // Serial.println("Server response: " + response);
+        // sendDebugMessage(response);
         if(response != "Unknown") {
-          // sendToArduino(response);
+          
           face_success = true;
           id = response;
           esp_camera_fb_return(fb);
           http.end();
           break;
         }
+    } else if (httpResponseCode == 404) {
+      JsonDocument res;
+      String response = http.getString();
+      deserializeJson(res, response.c_str());
+      const char* message = res["message"];
+      if (strcmp(message, "Dark") == 0) {
+        esp_camera_fb_return(fb);
+        http.end();
+        break;
+      }
     }
 
     esp_camera_fb_return(fb);

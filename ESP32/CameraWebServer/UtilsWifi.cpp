@@ -202,6 +202,28 @@ String checkIn(String id) {
    // Close HTTP connection
 }
 
+bool checkPhoto(String photo) {
+  HTTPClient http;
+
+  String serverURL = "http://10.1.1.44:8080/check-photo"; // Replace with your debug server URL
+
+  http.begin(serverURL);       // Initialize HTTP connection
+  http.addHeader("Content-Type", "application/json"); // Set content type to JSON
+
+  String jsonPayload = "{\"photo\":\"" + photo + "\"}"; // Create JSON payload
+  int httpResponseCode = http.POST(jsonPayload);        // Send POST request
+  Serial.flush();
+  http.end();
+  if (httpResponseCode == 200) {
+    String response = http.getString();
+    response.replace("\"", "");
+    if(response == "OK") return true;
+    else return false;
+  }
+  return false;
+   // Close HTTP connection
+}
+
 // Function to receive messages from the server
 String receiveMessageFromServer(String serverURL) {
   HTTPClient http;

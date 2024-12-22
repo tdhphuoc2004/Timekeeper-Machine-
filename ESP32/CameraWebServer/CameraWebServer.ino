@@ -154,14 +154,21 @@ void loop()
     {
       // messageFromArduino.concat(incomingChar);
       String messageFromArduino = receiveFromArduino();
-
+      sendDebugMessage(messageFromArduino);
       if(messageFromArduino == "Face") {
-        String id = faceServerHandle();
+        String photo = receiveFromArduino();
+        String id = faceServerHandle(photo);
         if (id != "NF" and id != "CAM") {
           String response = checkIn(id);
-          sendToArduino(response);
-        } else {
           sendToArduino(id);
+          sendToArduino(response);
+        } else if(id == "NF") {
+          if(checkPhoto(photo)) {
+            sendToArduino(id);
+          } else {
+            sendToArduino("Dark");
+          }
+          
         }
         
       } else {
