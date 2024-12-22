@@ -26,9 +26,8 @@ void setup() {
       lcd.backlight();
   }
   else lcd.noBacklight();
- 
 }
-
+  
 void loop() {
   // // handleInputID();
   char key = getKey();  // Use function call to get key
@@ -46,9 +45,11 @@ void loop() {
     } while(key < '1' or key > '3');
     if (key == '1') 
     {
+
       delay(100);
       clearLCD();
       printToLCD("Option 1", 0, 0);
+      signalOK(); 
       String res = RFIDtest('r', 1, "");
       Serial.println(res);
       sendToEsp32(res); 
@@ -56,6 +57,7 @@ void loop() {
       Serial.println("Response:");
       Serial.println(response); 
       printToLCD(res, 0, 0); 
+      
       if (response == "OK")
       {
          printToLCD("Successful", 0, 1); 
