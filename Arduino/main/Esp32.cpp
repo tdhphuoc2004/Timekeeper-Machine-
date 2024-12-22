@@ -7,7 +7,6 @@ void initializeEsp32() {
 void sendToEsp32(String message) {
   String modifiedMessage = "@" + message + "#"; 
   Serial.println(modifiedMessage);
-  espSerial.flush();
   espSerial.println(modifiedMessage);
 }
 
