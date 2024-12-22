@@ -29,7 +29,7 @@ String faceServerHandle() {
         // Serial.printf("HTTP Response code: %d\n", httpResponseCode);
         String response = http.getString();
         response.replace("\"", "");
-        // Serial.println("Server response: " + response);
+        Serial.println("Server response: " + response);
         sendDebugMessage(response);
         if(response != "Unknown") {
           // sendToArduino(response);
@@ -41,9 +41,11 @@ String faceServerHandle() {
         }
     }
 
+    esp_camera_fb_return(fb);
+    http.end();
+    if(millis() - startTime > 5000) break;
     
-    if(millis() - startTime > 8000) break;
-    delay(800);
+    delay(500);
   }
   if(face_success) return id;
   else return "NF";
