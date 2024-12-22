@@ -163,7 +163,7 @@ void handleServerRequests() {
 void sendDebugMessage(String message) {
   HTTPClient http;
 
-  String serverURL = "http://10.1.1.25:5001/api/debug"; // Replace with your debug server URL
+  String serverURL = "http://10.1.1.44:5001/api/debug"; // Replace with your debug server URL
 
   http.begin(serverURL);       // Initialize HTTP connection
   http.addHeader("Content-Type", "application/json"); // Set content type to JSON
@@ -183,7 +183,7 @@ void sendDebugMessage(String message) {
 String checkIn(String id) {
   HTTPClient http;
 
-  String serverURL = "http://10.1.1.25:5001/api/checkin/employee/"+id; // Replace with your debug server URL
+  String serverURL = "http://10.1.1.44:5001/api/checkin/employee/"+id; // Replace with your debug server URL
 
   http.begin(serverURL);       // Initialize HTTP connection
   http.addHeader("Content-Type", "application/json"); // Set content type to JSON

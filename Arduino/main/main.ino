@@ -92,8 +92,22 @@ void loop() {
       Serial.println("gg");
       printToLCD("Option 3", 0, 0);
       sendToEsp32("Face");
-      delay(9000);
-      Serial.print(receiveFromEsp32());  
+      String response = receiveFromEsp32(); 
+      Serial.println("Response:");
+      Serial.println(response); 
+      printToLCD(res, 0, 0); 
+      if (response == "OK")
+      {
+         printToLCD("Successful", 0, 1); 
+         setBuzzerState(BUZZER_OK); 
+          signalOK(); 
+      }
+      else
+      {
+         printToLCD("Fail", 0, 1); 
+         setBuzzerState(BUZZER_ERROR); 
+         signalFalse();
+      }
       
     } 
     

@@ -142,6 +142,13 @@ void loop()
   // String result = checkIn("22127000");
   // Serial.println(result);
   // faceServerHandle();
+  // String id = faceServerHandle();
+  // if (id != "NF" and id != "CAM") {
+  //   String response = checkIn(id);
+  //   sendToArduino(response);
+  // } else {
+  //   sendToArduino(id);
+  // }
     char incomingChar = Serial.read();
     if (incomingChar == '@') 
     {
@@ -167,6 +174,6 @@ void loop()
 
   // }
   // sendDebugMessage("Normal");
-  delay(100); 
+  delay(10000); 
   
 }
