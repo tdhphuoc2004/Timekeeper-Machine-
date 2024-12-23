@@ -11,11 +11,11 @@
 #include <HardwareSerial.h>
 HardwareSerial SerialPort(2); 
 
-const char* faceServerUrl = "http://10.1.1.44:8080/recognize-face";
+const char* faceServerUrl = "http://192.168.21.124:8080/recognize-face";
 #define RXp2 15
 #define TXp2 14
 
-const char* mqtt_server = "10.1.1.44"; // e.g., "192.168.1.10" or "broker.example.com"
+const char* mqtt_server = "192.168.21.124"; // e.g., "192.168.1.10" or "broker.example.com"
 const int mqtt_port = 1883;
 const char* mqtt_user = "user";
 const char* mqtt_password = "123456";
@@ -31,7 +31,7 @@ void setup() {
   // Serial.begin(115200);
   mqttClient.setServer(mqtt_server, mqtt_port);
   mqttClient.setCallback(callback);
- Serial.begin(115200);
+  Serial.begin(115200);
   Serial.setDebugOutput(true);
   // SerialPort.begin(115200, SERIAL_8N1,  RXp2, TXp2); // Serial1 for communication with Arduino
   // Serial.println("ESP32-CAM ready for bidirectional communication.");
@@ -136,21 +136,6 @@ void loop()
 {
   handleServerRequests();
   // mqtt_connect();
-  // if(faceServerHandle()) {
-  //   Serial.println("Success");
-  // };
-  // if (SerialPort.available() > 0) 
-  // {  // If data is available from Arduino
-  // String result = checkIn("22127000");
-  // Serial.println(result);
-  // faceServerHandle();
-  // String id = faceServerHandle();
-  // if (id != "NF" and id != "CAM") {
-  //   String response = checkIn(id);
-  //   sendToArduino(response);
-  // } else {
-  //   sendToArduino(id);
-  // }
     char incomingChar = Serial.read();
     if (incomingChar == '@') 
     {
@@ -186,10 +171,6 @@ void loop()
       }
 
     }
-      // sendDebugMessage("Nothing");
-
-  // }
-  // sendDebugMessage("Normal");
-  delay(10000); 
+  delay(100); 
   
 }

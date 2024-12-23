@@ -18,7 +18,7 @@ void setup() {
   Serial.begin(9600);
   espSerial.begin(115200);  // For debugging
   initializeLCD();
-  initLEDs(); 
+  initLEDs();
   initializeBuzzer(); 
   espSerial.flush();
   Serial.println("Arduino ready for communication.");  
@@ -26,7 +26,6 @@ void setup() {
 }
   
 void loop() {
-  // // handleInputID();
   if(isLightAboveThreshold(PHOTO_PIN, LIGHT_THRESHOLD))
   {
       lcd.backlight();
@@ -42,7 +41,6 @@ void loop() {
   if(key != NO_KEY) {
     Serial.println(key);
   }
-  // delay(100);
   if (key == '#') {
     Serial.println("Welcome");
     clearLCD();
@@ -64,7 +62,7 @@ void loop() {
       Serial.println("Response:");
       Serial.println(response); 
       printToLCD(res, 0, 0); 
-      if (response == "OK")
+      if (response[0] == 'O' and response[1] == 'K')
       {
          printToLCD("Successful", 0, 1); 
          setBuzzerState(BUZZER_OK); 
@@ -110,7 +108,7 @@ void loop() {
      
       Serial.println("Response:");
       Serial.println(response);
-      if (response == "OK")
+      if (response[0] == 'O' and response[1] == 'K')
       {
          printToLCD("Successful", 0, 1); 
          setBuzzerState(BUZZER_OK); 
@@ -134,11 +132,5 @@ void loop() {
   }
   
   delay(100);
-  //  turnOnRedLED(); 
-  //   delay(2000);
-  //  turnOnGreenLED(); 
-  //   delay(2000);
-  //   turnOffLEDs(); 
-  //   delay(2000);
 
 }
